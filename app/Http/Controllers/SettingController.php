@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Intervention\Image\ImageManagerStatic as Image;
@@ -363,6 +364,22 @@ class SettingController extends Controller
             return back()->with('errorMessage', $ex->getMessage());
         }
     }
+    public function artwork(){
+        try{
+            $rows = DB::table('type')->get();
+            $rows1 = DB::table('artwork')
+                ->select('*','artwork.id as p_id','artwork.name as p_name','type.name as t_name')
+                ->join('type','type.id','=','artwork.type_id')
+                ->join('services','services.id','=','artwork.cat_id')
+                ->join('sub_category','sub_category.id','=','artwork.subcat_id')
+                ->orderBy('artwork.id','desc')
+                ->paginate(20);
+            return view('admin.artwork', ['projects' => $rows1,'types' => $rows,]);
+        }
+        catch(\Illuminate\Database\QueryException $ex){
+            return back()->with('errorMessage', $ex->getMessage());
+        }
+    }
     public function getSubCatIdListAll(Request $request){
         try{
             $rows = DB::table('sub_category')
@@ -473,6 +490,103 @@ class SettingController extends Controller
             return back()->with('errorMessage', $ex->getMessage());
         }
     }
+    public function insertArtWork (Request $request){
+        try{
+            if($request) {
+                if ($request->id) {
+                    $data =DB::table('artwork')
+                        ->where('id', $request->id)->first();
+                    if($request->hasFile('c_image')) {
+                        $image       = $request->file('c_image');
+                        $c_filenameImage    = 'a'.time() . '.' .$image->getClientOriginalName();
+                        $image_resize = Image::make($image->getRealPath());
+                        $image_resize->resize(370, 270);
+                        $image_resize->save(public_path('images/' .$c_filenameImage));
+                    }
+                    else{
+                        $c_filenameImage = $data->c_image;
+                    }
+                    if($request->hasFile('image')) {
+                        $image       = $request->file('image');
+                        $filenameImage    = time() . '.' .$image->getClientOriginalName();
+                        $image_resize = Image::make($image->getRealPath());
+                        $image_resize->save(public_path('images/' .$filenameImage));
+                    }
+                    else{
+                        $filenameImage = $data->image;
+                    }
+                    $result =DB::table('artwork')
+                        ->where('id', $request->id)
+                        ->update([
+                            'type_id' => $request->type_id,
+                            'cat_id' => $request->cat_id,
+                            'subcat_id' => $request->subcat_id,
+                            'pattern' => $request->pattern,
+                            'name' => $request->name,
+                            'image' => $filenameImage,
+                            'c_image' => $c_filenameImage,
+                            'color' => json_encode($request->color),
+                            'art_value' => json_encode($request->art_value),
+                            'details' => $request->details,
+                        ]);
+                    if ($result) {
+                        return back()->with('successMessage', 'Data Update Successfully Done.');
+                    } else {
+                        return back()->with('errorMessage', 'Please Try Again.');
+                    }
+                }
+                else{
+                    if($request->hasFile('c_image')) {
+                        $image       = $request->file('c_image');
+                        $c_filenameImage    = 'a'.time() . '.' .$image->getClientOriginalName();
+                        $image_resize = Image::make($image->getRealPath());
+                        $image_resize->resize(370, 270);
+                        $image_resize->save(public_path('images/' .$c_filenameImage));
+                    }
+                    if($request->hasFile('image')) {
+                        $image       = $request->file('image');
+                        $filenameImage    = time() . '.' .$image->getClientOriginalName();
+                        $image_resize = Image::make($image->getRealPath());
+                        $image_resize->save(public_path('images/' .$filenameImage));
+                    }
+                    $result = DB::table('artwork')->insert([
+                        'type_id' => $request->type_id,
+                        'cat_id' => $request->cat_id,
+                        'subcat_id' => $request->subcat_id,
+                        'pattern' => $request->pattern,
+                        'name' => $request->name,
+                        'image' => $filenameImage,
+                        'c_image' => $c_filenameImage,
+                        'color' => json_encode($request->color),
+                        'art_value' => json_encode($request->art_value),
+                        'details' => $request->details,
+                    ]);
+                    if ($result) {
+                        return back()->with('successMessage', 'Data Insert Successfully Done.');
+                    } else {
+                        return back()->with('errorMessage', 'Please Try Again.');
+                    }
+                }
+            }
+            else{
+                return back()->with('errorMessage', 'Please Fill Up The Form.');
+            }
+        }
+        catch(\Illuminate\Database\QueryException $ex){
+            return back()->with('errorMessage', $ex->getMessage());
+        }
+    }
+    public function getArtworkById(Request $request){
+        try{
+            $rows = DB::table('artwork')
+                ->where('id', $request->id)
+                ->first();
+            return response()->json(array('data'=>$rows));
+        }
+        catch(\Illuminate\Database\QueryException $ex){
+            return response()->json(array('data'=>$ex->getMessage()));
+        }
+    }
     public function getProjectById(Request $request){
         try{
             $rows = DB::table('projects')
@@ -489,6 +603,26 @@ class SettingController extends Controller
 
             if($request->id) {
                 $result =DB::table('projects')
+                    ->where('id', $request->id)
+                    ->delete();
+                if ($result) {
+                    return back()->with('successMessage', 'Data Delete Successfully.');
+                } else {
+                    return back()->with('errorMessage', 'Please Try Again.');
+                }
+            }
+            else{
+                return back()->with('errorMessage', 'Please Try Again.');
+            }
+        }
+        catch(\Illuminate\Database\QueryException $ex){
+            return back()->with('errorMessage', $ex->getMessage());
+        }
+    }
+    public function deleteArtworkList(Request $request){
+        try{
+            if($request->id) {
+                $result =DB::table('artwork')
                     ->where('id', $request->id)
                     ->delete();
                 if ($result) {
@@ -804,6 +938,20 @@ class SettingController extends Controller
         try{
             $rows = DB::table('received_email')->orderBy('id','desc')->paginate(50);
             return view('admin.receivedEmail', ['emails' => $rows]);
+        }
+        catch(\Illuminate\Database\QueryException $ex){
+            return back()->with('errorMessage', $ex->getMessage());
+        }
+    }
+    public function orderDetails(){
+        try{
+            $products = DB::table('orders')
+                ->select('*','orders.id as p_id','artwork.name as a_name','orders.art_value as a_value')
+                ->join('artwork','artwork.id','=','orders.product_id')
+                ->join('users','users.id','=','orders.user_id')
+                ->orderBy('orders.id','desc')
+                ->paginate(20);
+            return view('admin.orderDetails', ['products' => $products]);
         }
         catch(\Illuminate\Database\QueryException $ex){
             return back()->with('errorMessage', $ex->getMessage());

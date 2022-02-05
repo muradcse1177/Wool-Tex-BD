@@ -3,8 +3,11 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Session;
 use Intervention\Image\ImageManagerStatic as Image;
 
 class WebsiteController extends Controller
@@ -94,7 +97,6 @@ class WebsiteController extends Controller
             return back()->with('errorMessage', $ex->getMessage());
         }
     }
-
     public function allServices(Request $request){
         try{
             $slides = DB::table('slide')->get();
@@ -184,6 +186,143 @@ class WebsiteController extends Controller
 				return back()->with('errorMessage', 'Please Try Again.');
 			}
 
+        }
+        catch(\Illuminate\Database\QueryException $ex){
+            return back()->with('errorMessage', $ex->getMessage());
+        }
+    }
+    public function customOrder(Request $request){
+        try{
+            $rows = DB::table('type')->get();
+            return view('website.customOrder',
+                ['types' => $rows,]
+            );
+        }
+        catch(\Illuminate\Database\QueryException $ex){
+            return back()->with('errorMessage', $ex->getMessage());
+        }
+    }
+    public function searchProduct(Request $request){
+        try{
+            $products = DB::table('artwork')
+                ->select('*')
+                ->where('type_id',$request->type_id)
+                ->where('cat_id',$request->cat_id)
+                ->where('subcat_id',$request->subcat_id)
+                ->orderBy('id','desc')
+                ->get();
+            return view('website.searchResultProduct',
+                ['projects' => $products]
+            );
+        }
+        catch(\Illuminate\Database\QueryException $ex){
+            return back()->with('errorMessage', $ex->getMessage());
+        }
+    }
+    public function projectArtwork(Request $request){
+        try{
+            $products = DB::table('artwork')
+                ->select('*')
+                ->where('id',$request->id)
+                ->first();
+            return view('website.orderProduct',
+                ['product' => $products]
+            );
+        }
+        catch(\Illuminate\Database\QueryException $ex){
+            return back()->with('errorMessage', $ex->getMessage());
+        }
+    }
+    public function myProfile(Request $request){
+        try{
+            if(Cookie:: get('user_id')) {
+                $products = DB::table('orders')
+                    ->select('*','orders.id as p_id')
+                    ->join('artwork','artwork.id','=','orders.product_id')
+                    ->where('orders.user_id', Cookie:: get('user_id'))
+                    ->orderBy('orders.id','desc')
+                    ->paginate(20);
+                return view('website.myProfile', ['products' => $products]);
+            }
+            else{
+                return redirect('login');
+            }
+        }
+        catch(\Illuminate\Database\QueryException $ex){
+            return back()->with('errorMessage', $ex->getMessage());
+        }
+    }
+    public function insertNewOrder(Request $request){
+        try{
+            if(Cookie:: get('user_id')){
+                $result = DB::table('orders')->insert([
+                    'user_id' => Cookie:: get('user_id'),
+                    'product_id' => $request->id,
+                    'address' => $request->address,
+                    'gender' => $request->gender,
+                    'a_color' => $request->a_color,
+                    'd_color' => $request->d_color,
+                    'quantity' => $request->quantity,
+                    'unit' => $request->unit,
+                    'art_value' => json_encode($request->art_value),
+                ]);
+                if ($result) {
+                    return redirect('myProfile')->with('successMessage', 'Order Successfully Done.');
+                } else {
+                    return back()->with('errorMessage', 'Please Try Again.');
+                }
+            }
+            else {
+                $rows = DB::table('users')
+                    ->where('email', $request->email)
+                    ->orWhere('phone', $request->phone)
+                    ->get()->count();
+                if ($rows > 0) {
+                    return redirect('login')->with('errorMessage', 'User Already Exits.Please Login.');
+                }
+                else{
+                    $result = DB::table('users')->insert([
+                        'name' => $request->name,
+                        'phone' => $request->phone,
+                        'email' => $request->email,
+                        'password' => Hash::make($request->password),
+                        'role' => 2,
+                    ]);
+                    if ($result) {
+                        $rows = DB::table('users')
+                            ->where('email', $request->email)
+                            ->get()->count();
+                        if ($rows > 0) {
+                            $rows = DB::table('users')
+                                ->where('email', $request->email)
+                                ->first();
+                            Session::put('user_info', $rows);
+                            Cookie::queue('user_id', $rows->id, time()+31556926 ,'/');
+                            Cookie::queue('role', $rows->role, time()+31556926 ,'/');
+                            Cookie::queue('user_name', $rows->name, time()+31556926 ,'/');
+                            Cookie::queue('customer', $rows->id, time()+31556926 ,'/');
+                            DB::table('orders')->insert([
+                                'user_id' => $rows->id,
+                                'product_id' => $request->id,
+                                'address' => $request->address,
+                                'gender' => $request->gender,
+                                'a_color' => $request->a_color,
+                                'd_color' => $request->d_color,
+                                'quantity' => $request->quantity,
+                                'unit' => $request->unit,
+                                'art_value' => json_encode($request->art_value),
+                            ]);
+                            return redirect()->to('myProfile');
+                        }
+                        else{
+                            return redirect()->to('home');
+                        }
+                    }
+                    else {
+                        return back()->with('errorMessage', 'Please Try Again.');
+                    }
+                }
+            }
         }
         catch(\Illuminate\Database\QueryException $ex){
             return back()->with('errorMessage', $ex->getMessage());

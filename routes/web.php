@@ -24,12 +24,17 @@ Route::get('service' , 'WebsiteController@service');
 Route::get('product' , 'WebsiteController@product');
 Route::post('send-mail' , 'WebsiteController@sendMail');
 Route::get('client' , 'WebsiteController@client');
-
 Route::get('logout' , 'AuthController@logout');
 Route::post('verifyUser' , 'AuthController@verifyUsers');
 Route::get('/login', function () {
     return view('admin.login');
+});Route::get('/signup', function () {
+    return view('admin.signup');
 });
+Route::post('insertCustomer' , 'AuthController@insertCustomer');
+Route::post('insertNewOrder' , 'WebsiteController@insertNewOrder');
+Route::get('myProfile' , 'WebsiteController@myProfile');
+
 if(Cookie::get('role') != null){
     Route::get('home' , 'SettingController@company_info');
 
@@ -52,16 +57,22 @@ if(Cookie::get('role') != null){
     Route::post('deleteServiceList' , 'SettingController@deleteServiceList');
 
     Route::get('subCategory' , 'SettingController@subCategory');
-    Route::get('getCategoryListAll' , 'SettingController@getCategoryListAll');
     Route::post('insertSubCategory' , 'SettingController@insertSubCategory');
     Route::post('getSubCategoryById' , 'SettingController@getSubCategoryById');
     Route::post('deleteSubCategoryList' , 'SettingController@deleteSubCategoryList');
 
     Route::get('projects' , 'SettingController@projects');
-    Route::get('getSubCatIdListAll' , 'SettingController@getSubCatIdListAll');
     Route::post('insertProjects' , 'SettingController@insertProjects');
     Route::post('getProjectById' , 'SettingController@getProjectById');
     Route::post('deleteProjectList' , 'SettingController@deleteProjectList');
+
+    Route::get('artwork' , 'SettingController@artwork');
+    Route::post('insertArtWork' , 'SettingController@insertArtWork');
+    Route::post('getArtworkById' , 'SettingController@getArtworkById');
+    Route::post('deleteArtworkList' , 'SettingController@deleteArtworkList');
+    Route::get('orderDetails' , 'SettingController@orderDetails');
+
+
     Route::get('clients' , 'SettingController@clients');
     Route::post('insertClients' , 'SettingController@insertClients');
     Route::post('getClientsById' , 'SettingController@getClientsById');
@@ -72,3 +83,8 @@ if(Cookie::get('role') != null){
     Route::post('deleteUserList' , 'SettingController@deleteUserList');
     Route::get('receivedEmail' , 'SettingController@receivedEmail');
 }
+Route::get('getCategoryListAll' , 'SettingController@getCategoryListAll');
+Route::get('getSubCatIdListAll' , 'SettingController@getSubCatIdListAll');
+Route::get('searchProduct' , 'WebsiteController@searchProduct');
+Route::get('customOrder' , 'WebsiteController@customOrder');
+Route::get('project-artwork' , 'WebsiteController@projectArtwork');

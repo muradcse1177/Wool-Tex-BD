@@ -216,6 +216,8 @@
                 <li class="@yield('servicesAdmin')"><a href ="{{ url('servicesAdmin') }}" ><i class="fa fa-calendar-times-o"></i> <span>Category Management</span></a></li>
                 <li class="@yield('subCategory')"><a href ="{{ url('subCategory') }}" ><i class="fa fa-medkit"></i> <span>Sub Category Management</span></a></li>
                 <li class="@yield('projects')"><a href ="{{ url('projects') }}" ><i class="fa fa-shopping-cart"></i> <span>Product Management</span></a></li>
+                <li class="@yield('artwork')"><a href ="{{ url('artwork') }}" ><i class="fa fa-shopping-cart"></i> <span>Artwork Management</span></a></li>
+                <li class="@yield('orderDetails')"><a href ="{{ url('orderDetails') }}" ><i class="fa fa-shopping-cart"></i> <span>Artwork Order</span></a></li>
                 <li class="@yield('clients')"><a href ="{{ url('clients') }}" ><i class="fa fa-clipboard"></i> <span>Client Management</span></a></li>
                 <li class="@yield('users')"><a href ="{{ url('users') }}" ><i class="fa fa-user"></i> <span>Users Management</span></a></li>
                 <li class="@yield('receivedEmail')"><a href ="{{ url('receivedEmail') }}" ><i class="fa fa-envelope"></i> <span>Received Email</span></a></li>

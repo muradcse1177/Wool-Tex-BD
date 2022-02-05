@@ -133,43 +133,50 @@
                             <ul class="navigation clearfix">
                                 <li class="@yield('hhh')"><a href="{{url('/')}}">Home</a></li>
                                 <li class="@yield('abb')"><a href="{{url('/about')}}">About us</a></li>
-                                <li class="dropdown @yield('as')"><a href="#">Products</a>
+                                <li class="dropdown @yield('as')"><a href="#">Services</a>
                                     <ul class="dropdown-menu-left">
                                         @foreach($services as $service)
                                         <li><a href="{{'product?id='.$service->id}}">{{$service->name}}</a></li>
                                         @endforeach
                                     </ul>
                                 </li>
-                                <li class="@yield('ap')"><a href="{{url('all-projects')}}">All Product</a></li>
+                                <li class="@yield('ap')"><a href="{{url('all-projects')}}">Products</a></li>
                                 <li class="@yield('cl')"><a href="{{url('client')}}">Our Client</a></li>
                                 <li class="@yield('cu')"><a href="{{url('contact')}}">Contact us</a></li>
-                                <li><a href="{{url('login')}}">Login</a></li>
+                                <li class="@yield('co')"><a href="{{url('customOrder')}}">Custom Order</a></li>
+                                @if(Cookie::get('user_id'))
+                                    <li class="@yield('mp')"><a href="{{url('myProfile')}}">My Profile</a></li>
+                                    <li><a href="{{url('logout')}}">Log Out</a></li>
+                                @else
+                                    <li><a href="{{url('login')}}">Login</a></li>
+                                    <li><a href="{{url('signup')}}">Sign Up</a></li>
+                                @endif
                             </ul>
                         </div>
                     </nav>
                     <!-- Main Menu End-->
-                    <div class="outer-box clearfix">
-                        <div class="search-box-outer">
-                            <div class="dropdown">
-                                <button class="search-box-btn dropdown-toggle" type="button" id="dropdownMenu3" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span class="fa fa-search"></span></button>
-                                <ul class="dropdown-menu pull-right search-panel" aria-labelledby="dropdownMenu3">
-                                    <li class="panel-outer">
-                                        <div class="form-container">
-                                            <form method="" action="#">
-                                                <div class="form-group">
-                                                    <input type="search" name="field-name" value="" placeholder="Search Here" required>
-                                                    <button type="submit" class="search-btn"><span class="fa fa-search"></span></button>
-                                                </div>
-                                            </form>
-                                        </div>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                        <div class="advisor-box">
-                            <a href="{{url('contact')}}" class="theme-btn advisor-btn">Find Advisor <span class="fa fa-long-arrow-right"></span></a>
-                        </div>
-                    </div>
+{{--                    <div class="outer-box clearfix">--}}
+{{--                        <div class="search-box-outer">--}}
+{{--                            <div class="dropdown">--}}
+{{--                                <button class="search-box-btn dropdown-toggle" type="button" id="dropdownMenu3" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span class="fa fa-search"></span></button>--}}
+{{--                                <ul class="dropdown-menu pull-right search-panel" aria-labelledby="dropdownMenu3">--}}
+{{--                                    <li class="panel-outer">--}}
+{{--                                        <div class="form-container">--}}
+{{--                                            <form method="" action="#">--}}
+{{--                                                <div class="form-group">--}}
+{{--                                                    <input type="search" name="field-name" value="" placeholder="Search Here" required>--}}
+{{--                                                    <button type="submit" class="search-btn"><span class="fa fa-search"></span></button>--}}
+{{--                                                </div>--}}
+{{--                                            </form>--}}
+{{--                                        </div>--}}
+{{--                                    </li>--}}
+{{--                                </ul>--}}
+{{--                            </div>--}}
+{{--                        </div>--}}
+{{--                        <div class="advisor-box">--}}
+{{--                            <a href="{{url('contact')}}" class="theme-btn advisor-btn">Find Advisor <span class="fa fa-long-arrow-right"></span></a>--}}
+{{--                        </div>--}}
+{{--                    </div>--}}
                 </div>
             </div>
         </div>
@@ -180,7 +187,7 @@
             <div class="auto-container clearfix">
                 <!--Logo-->
                 <div class="logo pull-left">
-                    <a href="{{url('/')}}" class="img-responsive"><img src="{{$rows->photo}}" alt="" title="" height="160" width="170"></a>
+                    <a href="{{url('/')}}" class="img-responsive"><img src="{{$rows->photo}}"></a>
                 </div>
 
                 <!--Right Col-->
@@ -200,17 +207,24 @@
                             <ul class="navigation clearfix">
                                 <li class="@yield('hhh')"><a href="{{url('/')}}">Home</a></li>
                                 <li class="@yield('abb')"><a href="{{url('/about')}}">About us</a></li>
-                                <li class="dropdown @yield('as')"><a href="#">Products</a>
+                                <li class="dropdown @yield('as')"><a href="#">Services</a>
                                     <ul class="dropdown-menu-left">
                                         @foreach($services as $service)
                                             <li><a href="{{'product?id='.$service->id}}">{{$service->name}}</a></li>
                                         @endforeach
                                     </ul>
                                 </li>
-                                <li class="@yield('ap')"><a href="{{url('all-projects')}}">All Product</a></li>
+                                <li class="@yield('ap')"><a href="{{url('all-projects')}}">Products</a></li>
                                 <li class="@yield('cl')"><a href="{{url('client')}}">Our Client</a></li>
                                 <li class="@yield('cu')"><a href="{{url('contact')}}">Contact us</a></li>
-                                <li><a href="{{url('login')}}">Login</a></li>
+                                <li class="@yield('co')"><a href="{{url('customOrder')}}">Custom Order</a></li>
+                                @if(Cookie::get('user_id'))
+                                    <li class="@yield('mp')"><a href="{{url('myProfile')}}">My Profile</a></li>
+                                    <li><a href="{{url('logout')}}">Log Out</a></li>
+                                @else
+                                    <li><a href="{{url('login')}}">Login</a></li>
+                                    <li><a href="{{url('signup')}}">Sign Up</a></li>
+                                @endif
                             </ul>
                         </div>
                     </nav><!-- Main Menu End-->
@@ -242,7 +256,7 @@
             </div>
         </div>
     </section>
-    <section class="contact-section">
+    <section class="contact-section aaaa">
         <div class="auto-container">
             <h2><span class="theme_color">Get</span> in Touch</h2>
             <div class="text">You can talk to our online representative at any time. Please use our Live Chat System on our website or Fill up below instant messaging programs. <br> Please be patient, We will get back to you. Our 24/7 Support, General Inquiries Phone: {{$rows->phone}}</div>
